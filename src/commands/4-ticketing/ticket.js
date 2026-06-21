@@ -121,6 +121,7 @@ module.exports = {
                 ticketId,
                 interaction.user.id,
                 interaction.guildId,
+                ticketChannel.id,
                 description
             );
 
@@ -186,14 +187,16 @@ module.exports = {
 
     async handleClose(interaction, client) {
         if (!interaction.deferred && !interaction.replied) {
-            await interaction.deferReply();
+            await interaction.deferReply({ ephemeral: true });
         }
 
         try {
-            const reason = interaction.options.getString('reason') || 'No reason provided';
+            const reason = interaction.isChatInputCommand()
+                ? interaction.options.getString('reason') || 'No reason provided'
+                : 'Closed via ticket panel';
 
-            // Get ticket data
-            const ticketData = await client.db.getTicket(
+            // Get ticket data by channel ID
+            const ticketData = await client.db.getTicketByChannel(
                 interaction.channelId,
                 client.cache
             );
