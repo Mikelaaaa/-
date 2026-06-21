@@ -156,6 +156,7 @@ module.exports = {
                         ticketName,
                         interaction.user.id,
                         interaction.guildId,
+                        ticketChannel.id,
                         'Ticket created from setup panel'
                     );
 
