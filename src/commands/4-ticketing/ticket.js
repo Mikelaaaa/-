@@ -256,7 +256,7 @@ module.exports = {
                     { name: 'User', value: `<@${ticketData.userId}>`, inline: true },
                     { name: 'Closed By', value: interaction.user.tag, inline: true }
                 )
-                .setColor(Colors.Gray)
+                .setColor(Colors.Greyple)
                 .setTimestamp();
 
             // Delete channel after 5 seconds
