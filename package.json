@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "deploy": "node src/utils/deployCommands.js",
-    "deploy:guild": "node src/utils/deployCommands.js --guild"
+    "deploy:guild": "node src/utils/deployCommands.js --guild",
+    "scaffold:command": "node scripts/scaffold-command.js"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.0.0",

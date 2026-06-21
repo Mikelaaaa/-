@@ -11,6 +11,7 @@ const {
     ButtonBuilder,
     ButtonStyle,
     ChannelType,
+    PermissionFlagsBits,
 } = require('discord.js');
 
 module.exports = {
@@ -18,6 +19,7 @@ module.exports = {
         .setName('ticket')
         .setDescription('📧 Create or manage support tickets')
         .setDMPermission(false)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addSubcommand(sub =>
             sub
                 .setName('create')
@@ -320,10 +322,13 @@ module.exports = {
         {
             customId: 'ticket_claim',
             async execute(interaction, client) {
-                await interaction.deferReply();
+                if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+                    return interaction.reply({ content: 'Only administrators can claim tickets.', ephemeral: true });
+                }
+
+                await interaction.deferReply({ ephemeral: true });
 
                 try {
-                    // Add user to channel
                     await interaction.channel.permissionOverwrites.edit(
                         interaction.user.id,
                         { SendMessages: true }
@@ -344,6 +349,10 @@ module.exports = {
         {
             customId: 'ticket_close',
             async execute(interaction, client) {
+                if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+                    return interaction.reply({ content: 'Only administrators can close tickets.', ephemeral: true });
+                }
+
                 try {
                     if (typeof module.exports.handleClose === 'function') {
                         await module.exports.handleClose(interaction, client);

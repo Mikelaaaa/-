@@ -3,13 +3,14 @@
  * Command: serverinfo - Display comprehensive server statistics
  */
 
-const { SlashCommandBuilder, EmbedBuilder, Colors, ChannelType } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, Colors, ChannelType, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('serverinfo')
         .setDescription('📊 Display comprehensive server statistics and information')
-        .setDMPermission(false),
+        .setDMPermission(false)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
     async execute(interaction, client) {
         await interaction.deferReply();

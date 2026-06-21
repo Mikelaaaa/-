@@ -1,10 +1,13 @@
-const { EmbedBuilder, Colors } = require('discord.js');
+const { EmbedBuilder, Colors, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction, client) {
         try {
             if (interaction.isChatInputCommand()) {
+                if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+                    return interaction.reply({ content: 'This bot is for server administrators only.', ephemeral: true });
+                }
                 const command = client.commands.get(interaction.commandName);
 
                 if (!command) {
@@ -28,6 +31,9 @@ module.exports = {
             }
 
             if (interaction.isButton()) {
+                if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+                    return interaction.reply({ content: 'Only administrators can use moderation buttons.', ephemeral: true });
+                }
                 let button = client.buttons.get(interaction.customId);
                 if (!button) {
                     for (const [key, value] of client.buttons) {

@@ -13,7 +13,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('setup')
         .setDescription('Configure ticketing and publish the ticket creation panel')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false)
         .addChannelOption(option =>
             option
@@ -111,6 +111,9 @@ module.exports = {
                 await interaction.deferReply({ ephemeral: true });
 
                 try {
+                    if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+                        return interaction.editReply({ content: 'Only administrators can create tickets from this panel.', ephemeral: true });
+                    }
                     const guildSettings = await client.db.getGuildSettings(interaction.guildId, client.cache);
 
                     if (!guildSettings.ticketCategory || !guildSettings.supportRoles?.length) {

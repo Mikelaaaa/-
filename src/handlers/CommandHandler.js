@@ -8,6 +8,14 @@ const path = require('path');
 const { REST } = require('discord.js');
 const Logger = require('../utils/Logger');
 
+const DEFAULT_COMMAND_CATEGORIES = new Set([
+    '1-moderation',
+    '4-ticketing',
+    '5-logging',
+    '9-autoroles',
+    '10-servermanagement',
+]);
+
 class CommandHandler {
     constructor(client) {
         this.client = client;
@@ -25,7 +33,7 @@ class CommandHandler {
      * Recursively load all commands from directory structure
      */
     async loadCommands(commandsPath) {
-        const categories = fs.readdirSync(commandsPath);
+        const categories = fs.readdirSync(commandsPath).filter(cat => DEFAULT_COMMAND_CATEGORIES.has(cat));
 
         for (const category of categories) {
             const categoryPath = path.join(commandsPath, category);
@@ -94,7 +102,7 @@ class CommandHandler {
      */
     async deployCommands(commandsPath, isGlobal = true) {
         const commands = [];
-        const categories = fs.readdirSync(commandsPath);
+        const categories = fs.readdirSync(commandsPath).filter(cat => DEFAULT_COMMAND_CATEGORIES.has(cat));
 
         for (const category of categories) {
             const categoryPath = path.join(commandsPath, category);

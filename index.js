@@ -80,6 +80,8 @@ const eventHandler = new EventHandler(client);
         const commandsPath = path.join(__dirname, 'src', 'commands');
         const eventsPath = path.join(__dirname, 'src', 'events');
 
+        await client.db.connect();
+        await client.cache.connect();
         await commandHandler.loadCommands(commandsPath);
         await eventHandler.loadEvents(eventsPath);
 
