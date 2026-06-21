@@ -111,9 +111,6 @@ module.exports = {
                 await interaction.deferReply({ ephemeral: true });
 
                 try {
-                    if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
-                        return interaction.editReply({ content: 'Only administrators can create tickets from this panel.', ephemeral: true });
-                    }
                     const guildSettings = await client.db.getGuildSettings(interaction.guildId, client.cache);
 
                     if (!guildSettings.ticketCategory || !guildSettings.supportRoles?.length) {

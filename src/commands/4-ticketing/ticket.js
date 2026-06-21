@@ -19,7 +19,6 @@ module.exports = {
         .setName('ticket')
         .setDescription('📧 Create or manage support tickets')
         .setDMPermission(false)
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addSubcommand(sub =>
             sub
                 .setName('create')
