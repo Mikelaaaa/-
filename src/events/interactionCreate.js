@@ -1,28 +1,20 @@
-const { EmbedBuilder, Colors, PermissionFlagsBits } = require('discord.js');
+const { EmbedBuilder, Colors } = require('discord.js');
 
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction, client) {
         try {
+            // Chat input commands: execute and let command-level permissions control access
             if (interaction.isChatInputCommand()) {
-                if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
-                    return interaction.reply({ content: 'This bot is for server administrators only.', ephemeral: true });
-                }
                 const command = client.commands.get(interaction.commandName);
 
                 if (!command) {
-                    return interaction.reply({
-                        content: '❌ Command not found.',
-                        ephemeral: true,
-                    });
+                    return interaction.reply({ content: '❌ Command not found.', ephemeral: true });
                 }
 
                 const rateLimitKey = `cmd_${interaction.user.id}`;
                 if (client.rateLimiter.isLimited(rateLimitKey)) {
-                    return interaction.reply({
-                        content: '⏰ You are being rate limited. Try again later.',
-                        ephemeral: true,
-                    });
+                    return interaction.reply({ content: '⏰ You are being rate limited. Try again later.', ephemeral: true });
                 }
 
                 await command.execute(interaction, client);
@@ -30,10 +22,8 @@ module.exports = {
                 return;
             }
 
+            // Buttons: find handler (handlers should enforce admin checks where needed)
             if (interaction.isButton()) {
-                if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
-                    return interaction.reply({ content: 'Only administrators can use moderation buttons.', ephemeral: true });
-                }
                 let button = client.buttons.get(interaction.customId);
                 if (!button) {
                     for (const [key, value] of client.buttons) {
