@@ -1,0 +1,18 @@
+{
+  "name": "fsociety-bot",
+  "version": "1.0.0",
+  "description": "Discord bot framework for FSOCIETY",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "deploy": "node src/utils/deployCommands.js",
+    "deploy:guild": "node src/utils/deployCommands.js --guild"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.0",
+    "discord.js": "^14.15.0",
+    "dotenv": "^16.3.1",
+    "mongoose": "^7.8.0",
+    "redis": "^4.7.0"
+  }
+}
