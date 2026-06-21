@@ -5,8 +5,18 @@
  */
 
 require('dotenv').config();
+const http = require('http');
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const path = require('path');
+
+// Render requires a port binding for web services
+const port = process.env.PORT || 3000;
+http.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('FSOCIETY bot is running');
+}).listen(port, () => {
+    console.log(`Health listener running on port ${port}`);
+});
 
 // Import handlers and utilities
 const CommandHandler = require('./src/handlers/CommandHandler');

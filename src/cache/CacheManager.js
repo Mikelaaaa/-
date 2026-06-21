@@ -16,24 +16,27 @@ class CacheManager {
      * Connect to Redis
      */
     async connect() {
+        const redisUrl = process.env.REDIS_URL;
+
+        if (!redisUrl) {
+            this.logger.warn('REDIS_URL not set; Redis cache disabled.');
+            this.client = null;
+            return;
+        }
+
         const maxRetries = parseInt(process.env.REDIS_CONNECT_RETRIES || '3', 10);
         const baseDelay = 500; // ms
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 this.client = redis.createClient({
-                    url: process.env.REDIS_URL || 'redis://localhost:6379',
+                    url: redisUrl,
                     socket: {
                         reconnectStrategy: (retries) => Math.min(retries * 50, 500),
                     },
                 });
 
-                if (!process.env.REDIS_URL) {
-                    this.logger.warn('REDIS_URL not set; using local default redis://localhost:6379');
-                } else {
-                    this.logger.info('Using Redis URL from environment (not printed for security)');
-                }
-
+                this.logger.info('Using Redis URL from environment (not printed for security)');
                 this.client.on('error', (err) => this.logger.error('Redis error:', err));
                 this.client.on('connect', () => this.logger.info('Redis connected'));
 
@@ -44,7 +47,6 @@ class CacheManager {
                 this.logger.warn(`Redis connection attempt ${attempt} failed: ${error.message}`);
                 if (attempt === maxRetries) {
                     this.logger.warn('Redis connection failed: max retries reached; continuing without cache');
-                    // Leave client as null to indicate cache not available
                     this.client = null;
                     break;
                 }
