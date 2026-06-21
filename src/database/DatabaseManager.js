@@ -311,11 +311,12 @@ class DatabaseManager {
     /**
      * Create ticket
      */
-    async createTicket(ticketId, userId, guildId, reason) {
+    async createTicket(ticketId, userId, guildId, channelId, reason) {
         return await Ticket.create({
             ticketId,
             userId,
             guildId,
+            channelId,
             reason,
             status: 'open',
             messages: [],
