@@ -196,12 +196,20 @@ module.exports = {
                 : 'Closed via ticket panel';
 
             // Get ticket data by channel ID
-            const ticketData = await client.db.getTicketByChannel(
+            let ticketData = await client.db.getTicketByChannel(
                 interaction.channelId,
                 client.cache
             );
 
+            if (!ticketData && interaction.channel?.name) {
+                const channelName = interaction.channel.name;
+                if (channelName.startsWith('ticket-')) {
+                    ticketData = await client.db.getTicket(channelName, client.cache);
+                }
+            }
+
             if (!ticketData) {
+                client.logger.warn(`Ticket close attempt failed: no ticket record for channel ${interaction.channelId}`);
                 return interaction.editReply({
                     embeds: [
                         new EmbedBuilder()
