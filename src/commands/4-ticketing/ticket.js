@@ -209,7 +209,7 @@ module.exports = {
             }
 
             if (!ticketData) {
-                client.logger.warn(`Ticket close attempt failed: no ticket record for channel ${interaction.channelId}`);
+                client.logger.warn(`Ticket close attempt failed: no ticket record for channel ${interaction.channelId}, name=${interaction.channel?.name || 'unknown'}`);
                 return interaction.editReply({
                     embeds: [
                         new EmbedBuilder()
@@ -220,11 +220,13 @@ module.exports = {
                 });
             }
 
-            // Generate transcript
-            const transcript = await this.generateTranscript(
-                interaction.channel,
-                client
-            );
+            // Generate transcript (non-fatal)
+            let transcript = '';
+            try {
+                transcript = await this.generateTranscript(interaction.channel, client);
+            } catch (transcriptError) {
+                client.logger.warn('Ticket transcript generation failed:', transcriptError.stack || transcriptError);
+            }
 
             // Update ticket status
             await client.db.closeTicket(
@@ -263,7 +265,10 @@ module.exports = {
             }, 5000);
 
         } catch (error) {
-            client.logger.error('Ticket close error:', error);
+            client.logger.error('Ticket close error:', error.stack || error);
+            if (!interaction.replied && !interaction.deferred) {
+                await interaction.deferReply({ ephemeral: true });
+            }
             await interaction.editReply({
                 embeds: [
                     new EmbedBuilder()
@@ -339,17 +344,20 @@ module.exports = {
         {
             customId: 'ticket_close',
             async execute(interaction, client) {
-                // Redirect to close command logic implemented in this module
-                await interaction.deferReply({ ephemeral: true });
                 try {
-                    // Reuse the module's handleClose method
                     if (typeof module.exports.handleClose === 'function') {
                         await module.exports.handleClose(interaction, client);
                     } else {
+                        if (!interaction.replied && !interaction.deferred) {
+                            await interaction.deferReply({ ephemeral: true });
+                        }
                         await interaction.editReply({ content: 'Close functionality not available.', ephemeral: true });
                     }
                 } catch (error) {
-                    client.logger.error('Ticket close button error:', error);
+                    client.logger.error('Ticket close button error:', error.stack || error);
+                    if (!interaction.replied && !interaction.deferred) {
+                        await interaction.deferReply({ ephemeral: true });
+                    }
                     await interaction.editReply({ content: 'An error occurred while closing the ticket.', ephemeral: true });
                 }
             },
