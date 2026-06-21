@@ -289,6 +289,26 @@ class DatabaseManager {
     }
 
     /**
+     * Get ticket by channel id
+     */
+    async getTicketByChannel(channelId, cache) {
+        const cacheKey = `ticket_channel_${channelId}`;
+
+        if (cache) {
+            const cached = await cache.get(cacheKey);
+            if (cached) return JSON.parse(cached);
+        }
+
+        const ticket = await Ticket.findOne({ channelId });
+
+        if (cache && ticket) {
+            await cache.set(cacheKey, JSON.stringify(ticket.toObject()), 1800);
+        }
+
+        return ticket?.toObject();
+    }
+
+    /**
      * Create ticket
      */
     async createTicket(ticketId, userId, guildId, reason) {
