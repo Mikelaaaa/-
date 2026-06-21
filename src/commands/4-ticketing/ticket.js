@@ -185,7 +185,9 @@ module.exports = {
     },
 
     async handleClose(interaction, client) {
-        await interaction.deferReply();
+        if (!interaction.deferred && !interaction.replied) {
+            await interaction.deferReply();
+        }
 
         try {
             const reason = interaction.options.getString('reason') || 'No reason provided';
